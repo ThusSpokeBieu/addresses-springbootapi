@@ -15,11 +15,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity @Table(name="pessoas")
-@Getter @Setter
+@Getter @Setter @Builder @AllArgsConstructor
 public class Person {
 
   @Serial
@@ -47,7 +49,7 @@ public class Person {
   @Column(name="ataualizado_em", nullable = false)
   private Calendar updatedAt;
 
-  @Column(name="deletado_em", nullable = true)
+  @Column(name="deletado_em")
   private Calendar deletedAt = null;
 
   public Person(){
@@ -118,11 +120,8 @@ public class Person {
     } else if (!updatedAt.equals(other.updatedAt))
       return false;
     if (deletedAt == null) {
-      if (other.deletedAt != null)
-        return false;
-    } else if (!deletedAt.equals(other.deletedAt))
-      return false;
-    return true;
+      return other.deletedAt == null;
+    } else return deletedAt.equals(other.deletedAt);
   }
   
   @Override

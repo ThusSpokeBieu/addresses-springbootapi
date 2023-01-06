@@ -1,12 +1,17 @@
 package com.myapp.addresses.dto.mapper;
 
+import java.util.List;
+
+import com.myapp.addresses.dto.AddressDto;
 import org.mapstruct.Mapper;
 
 import com.myapp.addresses.database.model.Address;
-import com.myapp.addresses.dto.AddressDTO;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface AddressMapper {
-  AddressDTO toDto(Address entity);
-  Address toEntity(AddressDTO dto);
+  AddressDto toDto(Address entity);
+  Address toEntity(AddressDto dto);
+
+  List<AddressDto> toDtoList (List<Address> entityList);
+  List<Address> toEntityList (List<AddressDto> dtoList);
 }

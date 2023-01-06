@@ -13,11 +13,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity @Table(name="endereços")
-@Getter @Setter
+@Builder
+@Getter @Setter @AllArgsConstructor
 public class Address implements Serializable {
  
   @Serial
@@ -48,7 +51,7 @@ public class Address implements Serializable {
   @Column(name = "atualizado_em", nullable = false)
   private Calendar updatedAt;
 
-  @Column(name = "deletado_em", nullable = true)
+  @Column(name = "deletado_em")
   private Calendar deletedAt = null;
 
   public Address(){
@@ -125,11 +128,8 @@ public class Address implements Serializable {
     } else if (!updatedAt.equals(other.updatedAt))
       return false;
     if (deletedAt == null) {
-      if (other.deletedAt != null)
-        return false;
-    } else if (!deletedAt.equals(other.deletedAt))
-      return false;
-    return true;
+      return other.deletedAt == null;
+    } else return deletedAt.equals(other.deletedAt);
   }
 
   @Override

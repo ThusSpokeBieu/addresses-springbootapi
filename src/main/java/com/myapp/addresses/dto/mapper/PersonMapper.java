@@ -3,10 +3,10 @@ package com.myapp.addresses.dto.mapper;
 import org.mapstruct.Mapper;
 
 import com.myapp.addresses.database.model.Person;
-import com.myapp.addresses.dto.PersonDTO;
+import com.myapp.addresses.dto.PersonDto;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PersonMapper {
-  PersonDTO toDto(Person entity);
-  Person toEntity(PersonDTO dto);
+  PersonDto toDto(Person entity);
+  Person toEntity(PersonDto dto);
 }
