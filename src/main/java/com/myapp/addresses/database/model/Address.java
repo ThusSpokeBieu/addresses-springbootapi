@@ -14,11 +14,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity @Table(name="endereços")
-@NoArgsConstructor @Getter @Setter
+@Getter @Setter
 public class Address implements Serializable {
  
   @Serial
@@ -51,6 +50,20 @@ public class Address implements Serializable {
 
   @Column(name = "deletado_em", nullable = true)
   private Calendar deletedAt = null;
+
+  public Address(){
+    Calendar now = Calendar.getInstance();
+    this.setCreatedAt(now);
+    this.setUpdatedAt(now);
+  }
+
+  public void delete(){
+    this.deletedAt = Calendar.getInstance();
+  }
+
+  public void restore(){
+    this.deletedAt = null;
+  }
 
   @Override
   public int hashCode() {
