@@ -16,8 +16,8 @@ import java.util.TimeZone;
 @Configuration
 public class Instantiation implements CommandLineRunner {
 
-    private PersonService personService;
-    private AddressService addressService;
+    private final PersonService personService;
+    private final AddressService addressService;
 
     public Instantiation(PersonService personService, AddressService addressService) {
         this.personService = personService;
@@ -38,41 +38,34 @@ public class Instantiation implements CommandLineRunner {
                 .streetAddress("Melville Street")
                 .city("Jackson, TN")
                 .zipCode("38301")
-                .createdAt(Calendar.getInstance())
-                .updatedAt(Calendar.getInstance())
                 .build();
 
         Address address2 = Address
                 .builder()
-                .number(1936)
-                .streetAddress("Melville Street")
-                .city("Jackson, TN")
-                .zipCode("38301")
-                .createdAt(Calendar.getInstance())
-                .updatedAt(Calendar.getInstance())
+                .number(4123)
+                .streetAddress("dasewa Street")
+                .city("casdrq TN")
+                .zipCode("38312301")
                 .build();
 
         Address address3 = Address
                 .builder()
-                .number(1936)
-                .streetAddress("Melville Street")
-                .city("Jackson, TN")
-                .zipCode("38301")
-                .createdAt(Calendar.getInstance())
-                .updatedAt(Calendar.getInstance())
+                .number(312312312)
+                .streetAddress("tESTe1")
+                .city("teste, TN")
+                .zipCode("teste")
                 .build();
 
         Person person1 = Person
                 .builder()
                 .name("Barbara E. Jenkin")
-                .birthday(LocalDate.of(2015, 3,5))
+                .birthdate(LocalDate.of(2015, 3,5))
                 .mainAddress(address1)
                 .addresses(Arrays.asList(address2, address3))
                 .createdAt(Calendar.getInstance())
                 .updatedAt(Calendar.getInstance())
                 .build();
 
-        addressService.saveAll(Arrays.asList(address1, address2, address3));
-        personService.save(person1);
+                personService.save(person1);
     }
 }

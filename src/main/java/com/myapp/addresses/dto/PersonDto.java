@@ -15,7 +15,7 @@ public class PersonDto implements Serializable {
   private static final long serialVersionUID = 1L;
  
   private String name;
-  private LocalDate birthday;
+  private LocalDate birthdate;
   private AddressDto mainAddress;
   private List<AddressDto> addresses;
 }

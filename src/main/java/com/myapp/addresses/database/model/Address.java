@@ -2,15 +2,14 @@ package com.myapp.addresses.database.model;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ import lombok.Setter;
 @Builder
 @Getter @Setter @AllArgsConstructor
 public class Address implements Serializable {
- 
+
   @Serial
   private static final long serialVersionUID = 1L;
   
@@ -41,33 +40,12 @@ public class Address implements Serializable {
   @Column(name = "Cidade", nullable = false)
   private String city;
 
-  @ManyToMany
-  @JoinColumn
+  @ManyToMany(fetch = FetchType.LAZY)
   private List<Person> residents;
 
-  @Column(name = "criado_em", nullable = false)
-  private Calendar createdAt;
-
-  @Column(name = "atualizado_em", nullable = false)
-  private Calendar updatedAt;
-
-  @Column(name = "deletado_em")
-  private Calendar deletedAt = null;
-
   public Address(){
-    Calendar now = Calendar.getInstance();
-    this.setCreatedAt(now);
-    this.setUpdatedAt(now);
   }
-
-  public void delete(){
-    this.deletedAt = Calendar.getInstance();
-  }
-
-  public void restore(){
-    this.deletedAt = null;
-  }
-
+ 
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -77,11 +55,9 @@ public class Address implements Serializable {
     result = prime * result + ((number == null) ? 0 : number.hashCode());
     result = prime * result + ((city == null) ? 0 : city.hashCode());
     result = prime * result + ((residents == null) ? 0 : residents.hashCode());
-    result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
-    result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
-    result = prime * result + ((deletedAt == null) ? 0 : deletedAt.hashCode());
     return result;
   }
+
 
   @Override
   public boolean equals(Object obj) {
@@ -117,26 +93,13 @@ public class Address implements Serializable {
         return false;
     } else if (!residents.equals(other.residents))
       return false;
-    if (createdAt == null) {
-      if (other.createdAt != null)
-        return false;
-    } else if (!createdAt.equals(other.createdAt))
-      return false;
-    if (updatedAt == null) {
-      if (other.updatedAt != null)
-        return false;
-    } else if (!updatedAt.equals(other.updatedAt))
-      return false;
-    if (deletedAt == null) {
-      return other.deletedAt == null;
-    } else return deletedAt.equals(other.deletedAt);
+    return true;
   }
+
 
   @Override
   public String toString() {
-    return "Address [zipCode=" + zipCode + ", streetAddress=" + streetAddress + ", number=" + number + ", city=" + city
-        + ", residents=" + residents + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", deletedAt="
-        + deletedAt + "]";
+    return number + ", " + streetAddress + " - " + city + ", " + zipCode;
   }
   
 }

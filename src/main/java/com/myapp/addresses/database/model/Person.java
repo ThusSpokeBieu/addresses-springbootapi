@@ -4,14 +4,13 @@ import java.io.Serial;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -27,35 +26,30 @@ public class Person {
   @Serial
   private static final long serialVersionUID = 1L;
   
-  private @Id @GeneratedValue(strategy = GenerationType.UUID) UUID id;
+  private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
 
   @Column(name="nome", nullable = false)
   private String name;
 
   @Column(name="data_de_nascimento", nullable = false)
-  private LocalDate birthday;
+  private LocalDate birthdate;
 
-  @ManyToOne
-  @JoinColumn
+  @ManyToOne(cascade = CascadeType.ALL)
   private Address mainAddress;
 
-  @ManyToMany
-  @JoinColumn
+  @ManyToMany(cascade = CascadeType.ALL)
   private List<Address> addresses;
 
   @Column(name="criado_em", nullable = false)
-  private Calendar createdAt;
+  private Calendar createdAt = Calendar.getInstance();
 
-  @Column(name="ataualizado_em", nullable = false)
-  private Calendar updatedAt;
+  @Column(name="atualizado_em", nullable = false)
+  private Calendar updatedAt = Calendar.getInstance();
 
   @Column(name="deletado_em")
   private Calendar deletedAt = null;
 
   public Person(){
-    Calendar now = Calendar.getInstance();
-    this.setCreatedAt(now);
-    this.setUpdatedAt(now);
   }
 
   public void delete(){
@@ -71,7 +65,7 @@ public class Person {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((birthday == null) ? 0 : birthday.hashCode());
+    result = prime * result + ((birthdate == null) ? 0 : birthdate.hashCode());
     result = prime * result + ((mainAddress == null) ? 0 : mainAddress.hashCode());
     result = prime * result + ((addresses == null) ? 0 : addresses.hashCode());
     result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
@@ -94,10 +88,10 @@ public class Person {
         return false;
     } else if (!name.equals(other.name))
       return false;
-    if (birthday == null) {
-      if (other.birthday != null)
+    if (birthdate == null) {
+      if (other.birthdate != null)
         return false;
-    } else if (!birthday.equals(other.birthday))
+    } else if (!birthdate.equals(other.birthdate))
       return false;
     if (mainAddress == null) {
       if (other.mainAddress != null)
@@ -126,7 +120,7 @@ public class Person {
   
   @Override
   public String toString() {
-    return "Person [name=" + name + ", birthday=" + birthday + ", mainAddress=" + mainAddress + ", addresses="
+    return "Person [name=" + name + ", birthdate=" + birthdate + ", mainAddress=" + mainAddress + ", addresses="
         + addresses + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", deletedAt=" + deletedAt + "]";
   }
   
