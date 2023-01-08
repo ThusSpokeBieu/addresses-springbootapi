@@ -3,7 +3,7 @@
 
 Projeto para teste prático e portfólio, que tem como objetivo principal criar uma API que possa:
 
-- [Criar uma pessoa](#criando-uma-pessoa)
+- [Criar uma pessoa](#criar-uma-pessoa)
 - [Editar uma pessoa](#editar-uma-pessoa)
 - [Consultar uma pessoa](#consultar-uma-pessoa)
 - [Listar pessoas](#listar-pessoas)
