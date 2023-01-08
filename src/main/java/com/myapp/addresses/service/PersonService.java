@@ -14,6 +14,11 @@ import com.myapp.addresses.dto.PersonDto;
 import com.myapp.addresses.dto.mapper.AddressMapper;
 import com.myapp.addresses.dto.mapper.PersonMapper;
 
+import jakarta.persistence.EntityManager;
+
+import org.hibernate.Filter;
+import org.hibernate.Session;
+
 @Service
 public class PersonService {
 
@@ -21,23 +26,31 @@ public class PersonService {
   private final AddressService addressService;
   private final PersonMapper personMapper;
   private final AddressMapper addressMapper;
+  private final EntityManager entityManager;
 
   public PersonService( PersonRepository repository, 
                         AddressService addressService, 
                         PersonMapper personMapper,
-                        AddressMapper addressMapper) {
+                        AddressMapper addressMapper,
+                        EntityManager entityManager) {
     this.repository = repository;
     this.addressService = addressService;
     this.personMapper = personMapper;
     this.addressMapper = addressMapper;
+    this.entityManager = entityManager;
   }
 
-  public List<Person> findAll() {
-    return repository.findAllActive();
+  public List<Person> findAll(boolean deleted) {
+    Session session = entityManager.unwrap(Session.class);
+    Filter filter = session.enableFilter("deletedPersonFilter");
+    filter.setParameter("deleted", deleted);
+    List<Person> people =  repository.findAll();
+    session.disableFilter("deletedPersonFilter");
+    return people;
   }
 
   public Optional<Person> findById(Long id){
-    return repository.findActiveById(id);
+    return repository.findById(id);
   }
 
   public void save(Person person) {
@@ -46,6 +59,10 @@ public class PersonService {
     newPerson.setCreatedAt(Calendar.getInstance());
     newPerson.setUpdatedAt(Calendar.getInstance());
     repository.save(newPerson);
+  }
+
+  public void saveAll(List<Person> people){
+    repository.saveAll(people);
   }
 
   public void deleteAll(){
@@ -88,8 +105,7 @@ public class PersonService {
   }
 
   public void delete(Long id){  
-    repository.softDeleteById(id);
+    repository.deleteById(id);
   }
- 
   
 }

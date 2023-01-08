@@ -32,7 +32,6 @@
                   <th scope="col">Endereço Principal</th>
                   <th scope="col">JSON</th>
                   <th scope="col"></th>
-                  <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
@@ -42,7 +41,6 @@
                   <td th:text="${person.birthdate}"></td>
                   <td th:text="${person.mainAddress}"></td>
                   <td><a th:href="@{'/person/' + ${person .id} }" class="btn btn-info">Json</a></td>
-                  <td><a th:href="@{'/person/edit/' + ${person .id} }" class="btn btn-warning">Alterar</a></td>
                   <td><a href="#" th:onclick="'if(confirm(\'Tem certeza que quer excluir?\')){ window.location.href = \'' + @{/person/{id}(id=${person.id})} + '/delete\'}'" class="btn btn-danger">Excluir</a></td>
               </tr>
               </tbody>

@@ -5,22 +5,20 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
 
-@Entity @Table(name="pessoas")
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity @Table(name="pessoas") @DynamicUpdate
 @Getter @Setter @Builder @AllArgsConstructor
+@SQLDelete(sql = "UPDATE pessoas SET deletado = true WHERE id=?")
+@FilterDef(name = "deletedPersonFilter", parameters = @ParamDef(name = "deleted", type = org.hibernate.type.descriptor.java.BooleanJavaType.class))
+@Filter(name = "deletedPersonFilter", condition = "deletado = :deleted")
 public class Person {
 
   @Serial
@@ -32,96 +30,45 @@ public class Person {
   private String name;
 
   @Column(name="data_de_nascimento", nullable = false)
+  @Temporal(TemporalType.DATE)
   private LocalDate birthdate;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Address mainAddress;
 
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Address> addresses;
 
+  @Builder.Default
   @Column(name="criado_em", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Calendar createdAt = Calendar.getInstance();
 
+  @Builder.Default
   @Column(name="atualizado_em", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
   private Calendar updatedAt = Calendar.getInstance();
 
-  @Column(name="deletado_em")
-  private Calendar deletedAt = null;
+  @Builder.Default
+  @Column(name="deletado")
+  private boolean deleted = false;
 
   public Person(){
   }
 
+	public void addAddresses(Address address) {
+    this.addresses.add(address);
+	}
+
+  public void addAddresses(List<Address> addresses) {
+    this.addresses.addAll(addresses);
+	}
+
   public void delete(){
-    this.deletedAt = Calendar.getInstance();
+    this.deleted = true;
   }
 
   public void restore(){
-    this.deletedAt = null;
+    this.deleted = false;
   }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((birthdate == null) ? 0 : birthdate.hashCode());
-    result = prime * result + ((mainAddress == null) ? 0 : mainAddress.hashCode());
-    result = prime * result + ((addresses == null) ? 0 : addresses.hashCode());
-    result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
-    result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
-    result = prime * result + ((deletedAt == null) ? 0 : deletedAt.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    Person other = (Person) obj;
-    if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
-    if (birthdate == null) {
-      if (other.birthdate != null)
-        return false;
-    } else if (!birthdate.equals(other.birthdate))
-      return false;
-    if (mainAddress == null) {
-      if (other.mainAddress != null)
-        return false;
-    } else if (!mainAddress.equals(other.mainAddress))
-      return false;
-    if (addresses == null) {
-      if (other.addresses != null)
-        return false;
-    } else if (!addresses.equals(other.addresses))
-      return false;
-    if (createdAt == null) {
-      if (other.createdAt != null)
-        return false;
-    } else if (!createdAt.equals(other.createdAt))
-      return false;
-    if (updatedAt == null) {
-      if (other.updatedAt != null)
-        return false;
-    } else if (!updatedAt.equals(other.updatedAt))
-      return false;
-    if (deletedAt == null) {
-      return other.deletedAt == null;
-    } else return deletedAt.equals(other.deletedAt);
-  }
-  
-  @Override
-  public String toString() {
-    return "Person [name=" + name + ", birthdate=" + birthdate + ", mainAddress=" + mainAddress + ", addresses="
-        + addresses + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", deletedAt=" + deletedAt + "]";
-  }
-  
 }

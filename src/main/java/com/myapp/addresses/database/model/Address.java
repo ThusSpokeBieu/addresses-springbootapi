@@ -15,11 +15,12 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity @Table(name="endereços")
+@Entity @Table(name="endereços") 
 @Builder
-@Getter @Setter @AllArgsConstructor
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor
 public class Address implements Serializable {
 
   @Serial
@@ -42,9 +43,6 @@ public class Address implements Serializable {
 
   @ManyToMany(fetch = FetchType.LAZY)
   private List<Person> residents;
-
-  public Address(){
-  }
  
   @Override
   public int hashCode() {

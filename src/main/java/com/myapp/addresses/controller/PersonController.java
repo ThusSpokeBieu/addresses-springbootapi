@@ -6,9 +6,11 @@ import java.util.Optional;
 
 import com.myapp.addresses.dto.AddressDto;
 import com.myapp.addresses.dto.PersonDto;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,7 +24,6 @@ import com.myapp.addresses.database.model.Address;
 import com.myapp.addresses.database.model.Person;
 import com.myapp.addresses.dto.mapper.AddressMapper;
 import com.myapp.addresses.dto.mapper.PersonMapper;
-import com.myapp.addresses.service.AddressService;
 import com.myapp.addresses.service.PersonService;
 
 import static java.util.stream.Collectors.toList;
@@ -34,17 +35,14 @@ import java.net.URI;
 public class PersonController {
 
   private final PersonService personService;
-  private final AddressService addressService;
 
   private final PersonMapper personMapper;
   private final AddressMapper addressMapper;
 
-  public PersonController(PersonService personService, 
-                          AddressService addressService, 
+  public PersonController(PersonService personService,
                           PersonMapper personMapper,
                           AddressMapper addressMapper) {
     this.personService = personService;
-    this.addressService = addressService;
     this.personMapper = personMapper;
     this.addressMapper = addressMapper;
   }
@@ -53,7 +51,7 @@ public class PersonController {
   @ResponseBody
   public ResponseEntity<List<PersonDto>> findAll(){
     try {
-          List<PersonDto> dtoList = personService.findAll()
+          List<PersonDto> dtoList = personService.findAll(false)
                               .stream()
                               .map(personMapper::toDto)
                               .collect(toList());
@@ -74,7 +72,7 @@ public class PersonController {
     }
   }
 
-  @GetMapping(value = "/{id}/addresses")
+  @GetMapping(value = "/addresses/{id}")
   public ResponseEntity<List<AddressDto>> getAddresses(@PathVariable Long id){
       Optional<Person> optPerson = personService.findById(id);
       if(optPerson.isPresent()){
@@ -88,7 +86,7 @@ public class PersonController {
       }
   }
 
-  @GetMapping(value = "/{id}/mainaddress")
+  @GetMapping(value = "/address/{id}")
   public ResponseEntity<AddressDto> getMainAddress(@PathVariable Long id){
       Optional<Person> optPerson = personService.findById(id);
       if(optPerson.isPresent()){
@@ -121,14 +119,32 @@ public class PersonController {
   }
 
   @PutMapping(value="/{id}")
-  public ResponseEntity<Person> update( @RequestBody PersonDto objDto, 
+  public ResponseEntity<PersonDto> updateAll( @RequestBody PersonDto objDto, 
                                         @PathVariable Long id){
       Person person = personMapper.toEntity(objDto);
       personService.update(person, id);
-      return ResponseEntity.ok().body(person);
+      return ResponseEntity.ok().body(objDto);
   }
 
-  @DeleteMapping(value="/delete/{id}")
+  @PatchMapping(value="/addresses/{id}")
+  public ResponseEntity<PersonDto> addAddress( @RequestBody AddressDto dto, 
+                                            @PathVariable Long id){
+      Person person = personService.findById(id).get();
+      person.addAddresses(addressMapper.toEntity(dto));
+      personService.update(person, id);
+      return ResponseEntity.ok().body(personMapper.toDto(person));
+  }
+
+  @PatchMapping(value="/address/{id}")
+  public ResponseEntity<PersonDto> updateMainAddress( @RequestBody AddressDto dto, 
+                                        @PathVariable Long id){
+      Person person = personService.findById(id).get();
+      person.setMainAddress(addressMapper.toEntity(dto));
+      personService.update(person, id);
+      return ResponseEntity.ok().body(personMapper.toDto(person));
+  }
+
+  @DeleteMapping(value="/{id}")
   public ResponseEntity<Person> delete(@PathVariable Long id){
       personService.delete(id);
       return ResponseEntity.ok().build();

@@ -1,6 +1,5 @@
 package com.myapp.addresses.service;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,13 +16,11 @@ public class AddressService {
   
   private final AddressRepository repository;
   private final AddressMapper addressMapper;
-  private final AddressRepository addressRepository;
 
   public AddressService(AddressRepository repository, AddressMapper addressMapper,
                         AddressRepository addressRepository) {
     this.repository = repository;
     this.addressMapper = addressMapper;
-    this.addressRepository = addressRepository;
   }
 
   public List<Address> findAll() {
