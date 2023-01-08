@@ -4,44 +4,71 @@ import java.io.Serial;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity @Table(name="pessoas") @DynamicUpdate
+@Getter @Setter @Builder @AllArgsConstructor
+@SQLDelete(sql = "UPDATE pessoas SET deletado = true WHERE id=?")
+@FilterDef(name = "deletedPersonFilter", parameters = @ParamDef(name = "deleted", type = org.hibernate.type.descriptor.java.BooleanJavaType.class))
+@Filter(name = "deletedPersonFilter", condition = "deletado = :deleted")
 public class Person {
 
   @Serial
   private static final long serialVersionUID = 1L;
   
-  private @Id @GeneratedValue(strategy = GenerationType.UUID) UUID id;
+  private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
 
   @Column(name="nome", nullable = false)
   private String name;
 
   @Column(name="data_de_nascimento", nullable = false)
-  private LocalDate birthday;
+  @Temporal(TemporalType.DATE)
+  private LocalDate birthdate;
 
-  @ManyToOne
-  @JoinColumn
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private Address mainAddress;
 
-  @ManyToMany
-  @JoinColumn
+  @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
   private List<Address> addresses;
 
+  @Builder.Default
   @Column(name="criado_em", nullable = false)
-  private Calendar createdAt;
+  @Temporal(TemporalType.TIMESTAMP)
+  private Calendar createdAt = Calendar.getInstance();
 
-  @Column(name="ataualizado_em", nullable = false)
-  private Calendar updatedAt;
+  @Builder.Default
+  @Column(name="atualizado_em", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Calendar updatedAt = Calendar.getInstance();
 
-  @Column(name="deletado_em", nullable = true)
-  private Calendar deletedAt = null;
-  
+  @Builder.Default
+  @Column(name="deletado")
+  private boolean deleted = false;
+
+  public Person(){
+  }
+
+	public void addAddresses(Address address) {
+    this.addresses.add(address);
+	}
+
+  public void addAddresses(List<Address> addresses) {
+    this.addresses.addAll(addresses);
+	}
+
+  public void delete(){
+    this.deleted = true;
+  }
+
+  public void restore(){
+    this.deleted = false;
+  }
 }
